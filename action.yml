@@ -1,10 +1,10 @@
-name: 'Print test results from JUnit XML'
+name: Print test results from JUnit XML
 inputs:
   folder:
-    description: 'Folder containing test results in JUnit's XML format'
+    description: Folder containing test results in JUnit's XML format
     required: true
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+  using: docker
+  image: Dockerfile
   args:
     - ${{ inputs.folder }}
