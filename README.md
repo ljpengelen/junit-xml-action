@@ -2,6 +2,22 @@
 
 A [Github Action](https://github.com/features/actions) that reads test results in JUnit's XML format and posts them in the [job summary](https://github.blog/2022-05-09-supercharging-github-actions-with-job-summaries/) of the job it is included in.
 
+## Usage
+
+To use this action in a job, include a step like this one:
+
+```
+- uses: ljpengelen/junit-xml-action@main
+  if: always()
+  with:
+    folder: build/test-results/test
+```
+
+The folder should contain the test results that you want to read and post in the job's summary.
+Their location depends on the tools you use to execute tests.
+For tests executed via Gradle, the results can be found in `build/test-results/test`.
+For tests executed via Maven's Surefire plugin, the results can be found in `target/surefire-reports`.
+
 ## Development
 ### Getting Started
 
