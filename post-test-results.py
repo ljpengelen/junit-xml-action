@@ -59,11 +59,14 @@ if __name__ == "__main__":
         sorted_by_method_name, key=attrgetter("className")
     )
 
-    for result in sorted_by_class_and_method_name:
-        if result.stackTrace is None:
-            print(f"✅ {result.className} - {result.name} passed in {result.time}s")
+    if "GITHUB_STEP_SUMMARY" in os.environ :
+        with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as github_step_summary:
+            for result in sorted_by_class_and_method_name:
+                if result.stackTrace is None:
+                    print(f"✅ {result.className} - {result.name} passed in {result.time}s", file=github_step_summary)
 
-    for result in sorted_by_class_and_method_name:
-        if result.stackTrace is not None:
-            print(f"❌ {result.className} - {result.name} failed in {result.time}s")
-            print(result.stackTrace)
+            for result in sorted_by_class_and_method_name:
+                if result.stackTrace is not None:
+                    print(f"<details>\n<summary>❌ {result.className} - {result.name} failed in {result.time}s</summary", file=github_step_summary)
+                    print(result.stackTrace, file=github_step_summary)
+                    print("</details>", file=github_step_summary)
