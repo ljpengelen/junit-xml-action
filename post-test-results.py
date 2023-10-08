@@ -68,5 +68,5 @@ if __name__ == "__main__":
             for result in sorted_by_class_and_method_name:
                 if result.stackTrace is not None:
                     print(f"<details>\n<summary>❌ {result.className} - {result.name} failed in {result.time}s</summary", file=github_step_summary)
-                    print(result.stackTrace, file=github_step_summary)
+                    print(f"```\n{result.stackTrace}```", file=github_step_summary)
                     print("</details>", file=github_step_summary)
