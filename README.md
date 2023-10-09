@@ -10,7 +10,7 @@ To use this action in a job, include a step like this one:
 - uses: ljpengelen/junit-xml-action@main
   if: always()
   with:
-    files: **/build/test-results/test/TEST-*.xml
+    files: "**/build/test-results/test/TEST-*.xml"
 ```
 
 The input parameter `files` is a [glob pattern](https://en.wikipedia.org/wiki/Glob_(programming)) matching the file names containing the test results that you want to read and post in the job's summary.
