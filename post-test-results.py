@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from operator import attrgetter
+from glob import iglob
 import os
-import re
 import sys
 import xml.etree.ElementTree as ET
 
@@ -31,9 +31,13 @@ def parse_test_case(element):
 
 
 def parse_junit_xml_file(file):
-    tree = ET.parse(file)
-    root = tree.getroot()
-    return [parse_test_case(child) for child in root.iter("testcase")]
+    try:
+        tree = ET.parse(file)
+        root = tree.getroot()
+        return [parse_test_case(child) for child in root.iter("testcase")]
+    except:  # pylint: disable=bare-except
+        print(f"Cannot process {file} as file in JUnit's XML format")
+        return []
 
 
 if __name__ == "__main__":
@@ -41,16 +45,11 @@ if __name__ == "__main__":
         print(f"Usage: {sys.argv[0]} FOLDER")
         sys.exit(1)
 
-    folder = sys.argv[1]
+    files = sys.argv[1]
 
-    xml_files = [
-        file
-        for file in os.scandir(folder)
-        if file.is_file() and re.match("TEST.*\\.xml$", file.name)
-    ]
     results = [
         test_result
-        for xml_file in xml_files
+        for xml_file in iglob(files, recursive=True)
         for test_result in parse_junit_xml_file(xml_file)
     ]
 
@@ -59,14 +58,24 @@ if __name__ == "__main__":
         sorted_by_method_name, key=attrgetter("className")
     )
 
-    if "GITHUB_STEP_SUMMARY" in os.environ :
-        with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as github_step_summary:
+    if "GITHUB_STEP_SUMMARY" in os.environ:
+        with open(
+            os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8"
+        ) as github_step_summary:
             for result in sorted_by_class_and_method_name:
                 if result.stackTrace is None:
-                    print(f"✅ {result.className} - {result.name} passed in {result.time}s", file=github_step_summary)
+                    print(
+                        f"✅ {result.className} - {result.name} passed in {result.time}s",
+                        file=github_step_summary,
+                    )
 
             for result in sorted_by_class_and_method_name:
                 if result.stackTrace is not None:
-                    print(f"<details>\n<summary>❌ {result.className} - {result.name} failed in {result.time}s</summary>", file=github_step_summary)
+                    print("<details>\n<summary>", file=github_step_summary)
+                    print(
+                        f"❌ {result.className} - {result.name} failed in {result.time}s",
+                        file=github_step_summary,
+                    )
+                    print("</summary>", file=github_step_summary)
                     print(f"\n```\n{result.stackTrace}```", file=github_step_summary)
                     print("</details>", file=github_step_summary)
