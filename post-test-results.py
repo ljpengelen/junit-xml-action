@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from operator import attrgetter
-from glob import iglob
+from glob import glob
 import os
 import sys
 import xml.etree.ElementTree as ET
@@ -42,14 +42,16 @@ def parse_junit_xml_file(file):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print(f"Usage: {sys.argv[0]} FOLDER")
+        print(f"Usage: {sys.argv[0]} PATTERN")
         sys.exit(1)
 
-    files = sys.argv[1]
+    pattern = sys.argv[1]
+    xml_files = glob(pattern, recursive=True)
+    print(f"Found {len(xml_files)} test reports")
 
     results = [
         test_result
-        for xml_file in iglob(files, recursive=True)
+        for xml_file in xml_files
         for test_result in parse_junit_xml_file(xml_file)
     ]
 
