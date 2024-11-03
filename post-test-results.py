@@ -47,7 +47,7 @@ if __name__ == "__main__":
 
     pattern = sys.argv[1]
     xml_files = glob(pattern, recursive=True)
-    print(f"Found {len(xml_files)} test reports")
+    print(f"Found {len(xml_files)} test report(s)")
 
     results = [
         test_result
